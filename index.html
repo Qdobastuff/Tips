@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catering Driver Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0e0c;
+    --card: #1a1917;
+    --border: #2e2c28;
+    --accent: #e8c547;
+    --accent2: #5bc4a0;
+    --text: #f0ece3;
+    --muted: #6b6660;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background-image: radial-gradient(circle at 20% 20%, #1e1c17 0%, transparent 60%),
+                      radial-gradient(circle at 80% 80%, #13201a 0%, transparent 60%);
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 440px;
+  }
+
+  header {
+    margin-bottom: 32px;
+  }
+
+  .title {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .title span { color: var(--accent); }
+
+  .subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+
+  .card.green::before {
+    background: linear-gradient(90deg, var(--accent2), transparent);
+  }
+
+  .card-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tag {
+    background: #252320;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  .card.green .tag { color: var(--accent2); }
+
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dollar {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  input[type="number"] {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--text);
+    width: 100%;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  input[type="number"]::placeholder { color: #2e2c28; }
+
+  .driver-result {
+    margin-top: 16px;
+    background: #252320;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .driver-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .driver-pct {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .driver-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .card.green .driver-value { color: var(--accent2); }
+
+  .summary {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 8px;
+  }
+
+  .summary-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid #1e1c18;
+  }
+
+  .summary-row:last-of-type { border-bottom: none; padding-bottom: 0; }
+
+  .summary-key { font-size: 12px; color: var(--muted); }
+
+  .summary-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .summary-val.total {
+    color: var(--accent);
+    font-size: 30px;
+  }
+
+  .summary-val.green { color: var(--accent2); }
+
+  .reset-btn {
+    margin-top: 20px;
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .zero { color: #2e2c28 !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="title">Driver <span>Calc</span></div>
+    <div class="subtitle">Catering Split Calculator</div>
+  </header>
+
+  <!-- Credit Tip -->
+  <div class="card">
+    <div class="card-label">
+      Credit Tip
+      <span class="tag">TIP</span>
+    </div>
+    <div class="input-row">
+      <span class="dollar">$</span>
+      <input type="number" id="tip" placeholder="0.00" min="0" step="0.01" oninput="calc()">
+    </div>
+    <div class="driver-result">
+      <div>
+        <div class="driver-label">Driver</div>
+        <div class="driver-pct">85%</div>
+      </div>
+      <div class="driver-value zero" id="tip-driver">$0.00</div>
+    </div>
+  </div>
+
+  <!-- Svc Charge / Delivery Fee -->
+  <div class="card green">
+    <div class="card-label">
+      Svc Charge
+      <span class="tag">DELIVERY FEE</span>
+    </div>
+    <div class="input-row">
+      <span class="dollar">$</span>
+      <input type="number" id="fee" placeholder="0.00" min="0" step="0.01" oninput="calc()">
+    </div>
+    <div class="driver-result">
+      <div>
+        <div class="driver-label">Driver</div>
+        <div class="driver-pct">70%</div>
+      </div>
+      <div class="driver-value zero" id="fee-driver">$0.00</div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-title">Driver Total</div>
+    <div class="summary-row">
+      <span class="summary-key">Credit Tip (85%)</span>
+      <span class="summary-val zero" id="s-tip">$0.00</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">Svc Charge / Delivery Fee (70%)</span>
+      <span class="summary-val green zero" id="s-fee">$0.00</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-key">Total to Driver</span>
+      <span class="summary-val total zero" id="s-total">$0.00</span>
+    </div>
+    <button class="reset-btn" onclick="reset()">↺ Reset</button>
+  </div>
+
+</div>
+
+<script>
+  function fmt(n) { return '$' + n.toFixed(2); }
+
+  function setEl(id, val) {
+    const el = document.getElementById(id);
+    el.textContent = fmt(val);
+    val === 0 ? el.classList.add('zero') : el.classList.remove('zero');
+  }
+
+  function calc() {
+    const tip = parseFloat(document.getElementById('tip').value) || 0;
+    const fee = parseFloat(document.getElementById('fee').value) || 0;
+    const tipDriver = tip * 0.85;
+    const feeDriver = fee * 0.70;
+    setEl('tip-driver', tipDriver);
+    setEl('fee-driver', feeDriver);
+    setEl('s-tip',      tipDriver);
+    setEl('s-fee',      feeDriver);
+    setEl('s-total',    tipDriver + feeDriver);
+  }
+
+  function reset() {
+    document.getElementById('tip').value = '';
+    document.getElementById('fee').value = '';
+    calc();
+  }
+</script>
+</body>
+</html>
